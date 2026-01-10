@@ -1,7 +1,7 @@
 @echo off
 
 echo Assembling data block on RAM 2
-pasmo --public bank_2_data.asm bank_2_data.bin bank_2_data.sym
+pasmo --public bank_2_data.asm nul bank_2_data.sym
 echo ...
 
 echo Assembling RAM 5

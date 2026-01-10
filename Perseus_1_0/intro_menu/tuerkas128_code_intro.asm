@@ -209,6 +209,10 @@ IntroTuerkasSPR		defw	INTRO_TUERKAS_SPR0, INTRO_TUERKAS_SPR1, INTRO_TUERKAS_SPR2
 T128_IntroBS1:		xor		a
 					out		(254), a					; BORDER 0
 					call	IntroClearScreen
+
+					  call	IntroTitle	
+					  jp		MenuMenu
+
 					ld		d, 1
 					ld		hl, 0
 					call	IntroPause

@@ -87,11 +87,17 @@ T128_SychroFPS:		ld		b, T128_FPS					; 1 = 50 fps   2 = 25 fps   3 = 16,66 fps  
 ;					
 ; Wait until b interrupts have occurred 
 ;
+					 ld  a, 1
+					 out (254), a
+
 					ld		hl, T128_ClockTicksPrevious
 SFPS_Loop_01:		ld		a, (T128_ClockTicks)
 					sub		(hl)
-					cp		b
+					sub		b
 					jr		c, SFPS_Loop_01
+
+					 out (254), a
+
 ;
 ; Reset previous clock ticks			
 ;

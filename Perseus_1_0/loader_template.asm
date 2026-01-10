@@ -85,6 +85,9 @@ Loader:				ld      sp, 0
 					ld		a, ($c000)						; Read test value
             		ld		hl, $0604						; Contended banks
 					ld		de, $0301						; and not contended banks
+            		; ld		hl, $0104						; Contended banks
+					; ld		de, $0306						; and not contended banks
+
 					cp		%11100111						; for +2A/+3 models
 					jr		z, L_Label_01
 					ex		de, hl							; exchange banks for 128/+2 models

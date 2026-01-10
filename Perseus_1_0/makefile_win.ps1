@@ -32,14 +32,15 @@ Write-Host "Processing loader_template.asm --> loader.asm "
 #
 # Binary files
 #
-$file0 = ".\bank_0.bin"
-$file2 = ".\bank_2.bin"
-$file5 = ".\bank_5.bin"
-$file7 = ".\bank_7.bin"
-$fileFB1= ".\bank_F1.bin"
-$fileFB2= ".\bank_F2.bin"
-$fileSB1= ".\bank_S1.bin"
-$fileSB2= ".\bank_S2.bin"
+$fileScr = ".\perseus.scr.zx0"
+$file0 = ".\bank_0.bin.zx0"
+$file2 = ".\bank_2.bin.zx0"
+$file5 = ".\bank_5.bin.zx0"
+$file7 = ".\bank_7.bin.zx0"
+$fileFB1= ".\bank_F1.bin.zx0"
+$fileFB2= ".\bank_F2.bin.zx0"
+$fileSB1= ".\bank_S1.bin.zx0"
+$fileSB2= ".\bank_S2.bin.zx0"
 
 
 #
@@ -55,6 +56,7 @@ $finalFile = ".\loader.asm"
 #
 # Get file sizes
 #
+$fileScrSize = (Get-Item $fileScr).Length
 $file0Size = (Get-Item $file0).Length
 $file2Size = (Get-Item $file2).Length
 $file5Size = (Get-Item $file5).Length
@@ -72,6 +74,7 @@ $textContent = Get-Content $templateFile
 #
 # Tokens
 #
+$markScr = "<SizeScr>"
 $mark0 = "<Size0>"
 $mark2 = "<Size2>"
 $mark5 = "<Size5>"
@@ -84,7 +87,7 @@ $markSB2 = "<SizeSB2>"
 #
 # Replace tokes with file sizes
 #
-$textNewContent = $textContent -replace $mark0, $file0Size -replace $mark2, $file2Size -replace $mark5, $file5Size -replace $mark7, $file7Size -replace $markFB1, $fileFB1Size -replace $markFB2, $fileFB2Size -replace $markSB1, $fileSB1Size -replace $markSB2, $fileSB2Size
+$textNewContent = $textContent -replace $mark0, $file0Size -replace $mark2, $file2Size -replace $mark5, $file5Size -replace $mark7, $file7Size -replace $markFB1, $fileFB1Size -replace $markFB2, $fileFB2Size -replace $markSB1, $fileSB1Size -replace $markSB2, $fileSB2Size -replace $markScr, $fileScrSize
 
 #
 # Output file

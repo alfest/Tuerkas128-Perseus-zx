@@ -30,6 +30,7 @@ include ".\framework\tuerkas128_global.asm"					; Global constants
 ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+SCREEN_LENGTH		EQU		<SizeScr>
 RAM0_LENGTH			EQU		<Size0>							; Size of bank0.bin file 	(FSMs for game etities) [CUSTOM]
 RAM2_LENGTH			EQU		<Size2>							; Size of bank2.bin file 	(game loop and rendering routines) [FRAMEWORK CORE]
 RAM5_LENGTH			EQU		<Size5>							; Size of bank5.bin file 	(blocks and superblocks; gamevars) [CUSTOM]
@@ -38,6 +39,8 @@ RAMFB1_LENGTH		EQU		<SizeFB1>						; Size of bankFB1.bin file 	(sound tracker) (
 RAMFB2_LENGTH		EQU		<SizeFB2>						; Size of bankFB2.bin file 	(game map) [CUSTOM]
 RAMSB1_LENGTH		EQU		<SizeSB1>						; Size of bankSB1.bin file 	(intro, menu, game over) [CUSTOM]
 RAMSB2_LENGTH		EQU		<SizeSB2>						; Size of bankSB2.bin file	(bitmaps for sprites an aminated blocks) [CUSTOM]
+
+LOAD_ADDRESS		EQU		$8100							; Loading address
 
 Loader:				ld      sp, 0  
 					di
@@ -56,18 +59,8 @@ Loader:				ld      sp, 0
 					ld		a, %11100111
 					ld		($c000), a						; Write 11100111 in bank 0
 ;
-					; ld		a, ($5b5c)					
-					; ld		e, a							; Save last value of port 7ffd in register e
-					; ld		a, ($5b67)				
-					; ld		d, a							; Save last value of port 1ffd in register d
-
-					ld  de, 410h							; 1ffd=4 - 48k basic ROM, Motor off, normal paging
-															; 7ffd=10h - default
-
-;
-					; and		%11111000
-					; or		%00000011					
-					ld		a, 3							; allram mode
+					ld  	de, $410							; 1ffd=4 - 48k basic ROM, Motor off, normal paging		
+					ld		a, %00000011					; allram mode
 
 					ld		bc, $1ffD
 					out		(c), a							; Select special paging mode (+2A/+3) RAM 4 / RAM 5 / RAM 6 / RAM 7
@@ -98,14 +91,6 @@ Loader:				ld      sp, 0
 L_Label_01			ld		(T128_SlowBank1), hl
 					ld      (T128_SlowBank1+2), de					
 ;
-; Show hardware detection on screen
-;
-;					ld      hl, $4000
-;					ld      de, $4001
-;					ld      bc, 6143
-;					ld      (hl), a
-;					ldir
-;
 ; Move loader to high memory 
 ;					
 L_Label_02:			ld		hl, L_Loader
@@ -118,46 +103,53 @@ L_Label_02:			ld		hl, L_Loader
 ;
 L_Loader:			ld      sp, $c000  						; sp must be <= $c000
 ;
-					ld      ix, $4000						; Loading address
-					ld      de, 6912
+					ld      hl, $4000						; Loading address
+					ld      de, SCREEN_LENGTH
 					call    L_LoadBlock-L_Loader+$bf00		; Load screen
 					
-					ld      ix, $5b00						; Loading address
+					ld      hl, $5b00						; Loading address
 					ld      de, RAM5_LENGTH				
 					call    L_LoadBlock-L_Loader+$bf00		; Load bank 5
 ;
-					ld      ix, T128_MAIN					; Loading address
-					ld      de, RAM2_LENGTH				
-					call    L_LoadBlock-L_Loader+$bf00		; Load bank 2
-;
-					ld      ix, $c000						; Loading address
+					ld      hl, $c000						; Loading address
 					ld      de, RAM0_LENGTH				
 					call    L_LoadBlock-L_Loader+$bf00		; Load bank 0
 ;					
 					ld		a, 7
-					ld      ix, $db00						; Loading address
+					ld      hl, $db00						; Loading address
 					ld      de, RAM7_LENGTH				
 					call	L_SetBank-L_Loader+$bf00		; Load bank 7
 ;
 					ld		a, (T128_SlowBank1)
-					ld      ix, $c000						; Loading address
+					ld      hl, $c000						; Loading address
 					ld      de, RAMSB1_LENGTH			
 					call	L_SetBank-L_Loader+$bf00		; Load Slow Bank 1
 ;
 					ld		a, (T128_SlowBank2)			
-					ld      ix, $c000						; Loading address
+					ld      hl, $c000						; Loading address
 					ld      de, RAMSB2_LENGTH			
 					call	L_SetBank-L_Loader+$bf00		; Load Slow Bank 2
 ;
 					ld		a, (T128_FastBank1)			
-					ld      ix, $c000						; Loading address
+					ld      hl, $c000						; Loading address
 					ld      de, RAMFB1_LENGTH			
 					call	L_SetBank-L_Loader+$bf00		; Load Fast Bank 1
 ;
 					ld		a, (T128_FastBank2)			
-					ld      ix, $c000						; Loading address
+					ld      hl, $c000						; Loading address
 					ld      de, RAMFB2_LENGTH			
 					call	L_SetBank-L_Loader+$bf00		; Load Fast Bank 2
+
+					ld      de, RAM2_LENGTH				
+					ld		hl, LaunchGame-L_Loader+$bf00
+					push	hl								; Save return address
+					ld      hl, T128_MAIN					; Loading address
+					push	hl
+					ld		ix, $beff-RAM2_LENGTH			; Load bank 2
+					jr		LoadCustom
+
+
+LaunchGame:
 ;
 ; Set border and run game
 ;
@@ -174,10 +166,23 @@ L_SetBank:			ld		b, a							; b = mamory bank
 					ld 		bc, $7ffd
 					ld 		(T128_LastValue7ffd), a
 					out 	(c), a							; Select memory bank
-L_LoadBlock:		scf
+L_LoadBlock:
+					push	hl
+					ld		ix, LOAD_ADDRESS
+
+LoadCustom:
+					push 	ix
+					scf
 					sbc     a, a
 					call	$0556							; Load block using ROM					
 					di
-					ret
+
+					pop		hl
+					pop		de
+					; ret
+
+Decompress:
+					INCLUDE ".\zx0_decoder_standard.asm"	; ZX0 decompressor
+
 LoaderEnd:
 end Loader		

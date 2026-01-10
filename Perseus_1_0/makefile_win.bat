@@ -36,6 +36,10 @@ echo Assembling main block on RAM 2
 pasmo --public bank_2.asm bank_2.bin bank_2.sym
 echo ...
 
+echo Compressing blocks
+for %%f in (bank_*.bin, perseus.scr) do salvador %%f %%f.zx0
+echo ...
+
 powershell -ExecutionPolicy Bypass -file .\makefile_win.ps1
 
 echo Assembling loader
@@ -43,5 +47,5 @@ pasmo --public loader.asm loader.bin loader.sym
 echo ...
 
 echo Generating TAP file
-GenTape   perseus.tap   basic Perseus 10 loader.bin   data perseus.scr   data bank_5.bin   data bank_2.bin   data bank_0.bin   data bank_7.bin   data bank_S1.bin   data bank_S2.bin   data bank_F1.bin   data bank_F2.bin
+GenTape perseus.tap basic Perseus 10 loader.bin data perseus.scr.zx0 data bank_5.bin.zx0 data bank_0.bin.zx0 data bank_7.bin.zx0 data bank_S1.bin.zx0 data bank_S2.bin.zx0 data bank_F1.bin.zx0 data bank_F2.bin.zx0 data bank_2.bin.zx0
 echo ...

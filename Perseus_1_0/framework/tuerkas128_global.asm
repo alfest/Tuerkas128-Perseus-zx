@@ -11,8 +11,9 @@
 ;   1 = English
 ;   2 = Portuguese
 ;
+IF !DEFINED T128_LANGUAGE
 T128_LANGUAGE			EQU		1
-
+ENDIF
 
 ;
 ; MASKED / NON MASKED SPRITES

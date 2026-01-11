@@ -94,6 +94,6 @@ $textNewContent = $textContent -replace $mark0, $file0Size -replace $mark2, $fil
 #
 $textNewContent | Set-Content $finalFile 
 
-Write-Host "..."
+#Write-Host "..."
 
 

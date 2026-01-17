@@ -20,7 +20,8 @@ Available in [itchio](https://retrobensoft.itch.io/perseus)
 * Manuel Pena (original sketch of Graia)
 * Ramón Fernández Ameijeiras (sinclair joystick tester)
 * David Gonzalo aka Z80user (code optimization for the loader)
-* André Leão (portuguese version proofreading)​
+* André Leão (portuguese version proofreading)
+* Alfest (USR 0 [DivMMC] incompatibility and falling coin crash in screen 6_15)​
 
 ### Dedicated to
 Sara & Susana
